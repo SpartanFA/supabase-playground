@@ -6,7 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.1.4",
+    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "10.4.17",

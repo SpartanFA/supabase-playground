@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@clerk/nextjs": {
+      "signature": "dfbf4ab663419af320f00e25e8b9f445",
+      "file": true,
+      "replaced": "^5.1.4"
+    }
+  }
+}
