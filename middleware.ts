@@ -1,9 +1,10 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
-export async function middleware(request: NextRequest) {
+export default clerkMiddleware(async (auth, request, event) => {
   return await updateSession(request);
-}
+});
 
 export const config = {
   matcher: [
