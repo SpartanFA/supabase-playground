@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
+import bcrypt from "bcrypt";
+import { inngest } from "../inngest/inngest.client";
 
 export default function Login({
   searchParams,
@@ -36,7 +38,7 @@ export default function Login({
     const password = formData.get("password") as string;
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -48,7 +50,44 @@ export default function Login({
       return redirect("/login?message=Could not authenticate user");
     }
 
-    return redirect("/login?message=Check email to continue sign in process");
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TRICKLE MIGRATION CODE
+    //
+
+    const { user } = data;
+
+    if (!user) {
+      throw new Error("No error, but no user... this should never happen.");
+    }
+
+    const external_id = user.id;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await inngest.send({
+      name: "migration/trickle/create-clerk-user",
+      data: {
+        email,
+        hashed_password: hashedPassword,
+        external_id: external_id,
+      },
+    });
+
+    //
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      return redirect("/login?message=Could not authenticate user");
+    }
+
+    return redirect("/protected");
   };
 
   return (
