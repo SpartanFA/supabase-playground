@@ -12,7 +12,11 @@ const createClerkUserEvent = z.object({
   }),
 }) satisfies LiteralZodEventSchema;
 
+if (!process.env.INNGEST_APP_ID) {
+  throw new Error("INNGEST_APP_ID is not set");
+}
+
 export const inngest = new Inngest({
-  id: "12345",
+  id: process.env.INNGEST_APP_ID,
   schemas: new EventSchemas().fromZod([createClerkUserEvent]),
 });
