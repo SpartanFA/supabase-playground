@@ -11,30 +11,40 @@ const schema = z.array(
 );
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
-  if (!req.body) {
-    return NextResponse.json({ message: "No body" }, { status: 400 });
+  try {
+    if (!req.body) {
+      return NextResponse.json({ message: "No body" }, { status: 400 });
+    }
+    const users = schema.parse(await req.json());
+
+    await Promise.all(
+      users.map((user) => {
+        const { email, hashed_password, external_id } = user;
+        return inngest.send({
+          name: "migration/create-clerk-user",
+          data: {
+            is_batch: true,
+            email,
+            hashed_password,
+            external_id,
+          },
+        });
+      })
+    );
+
+    return NextResponse.json(
+      { message: `${users.length} users queued` },
+      { status: 200 }
+    );
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
+    return NextResponse.json(
+      { message: "An unknown error occurred" },
+      { status: 500 }
+    );
   }
-  const users = schema.parse(await req.json());
-
-  await Promise.all(
-    users.map((user) => {
-      const { email, hashed_password, external_id } = user;
-      return inngest.send({
-        name: "migration/create-clerk-user",
-        data: {
-          is_batch: true,
-          email,
-          hashed_password,
-          external_id,
-        },
-      });
-    })
-  );
-
-  return NextResponse.json(
-    { message: `${users.length} users queued` },
-    { status: 200 }
-  );
 };
 
 export const GET = async (req: NextRequest, res: NextResponse) => {
