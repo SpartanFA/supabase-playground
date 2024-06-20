@@ -2,14 +2,15 @@ import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import getMigrationState from "@/utils/get-migration-state";
+import { isMigrationFinished } from "@/utils/get-migration-state";
+
 export default async function AuthButton() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // If the migration is finished, we show the clerk user button.
   //
 
-  if (getMigrationState() === "finished") {
+  if (isMigrationFinished()) {
     return (
       <>
         <SignedIn>

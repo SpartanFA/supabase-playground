@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import bcrypt from "bcrypt";
 import { inngest } from "../inngest/inngest.client";
-import getMigrationState from "@/utils/get-migration-state";
+import {
+  isMigrationFinished,
+  isMigrationTrickle,
+} from "@/utils/get-migration-state";
 
 export default function Login({
   searchParams,
@@ -15,7 +18,7 @@ export default function Login({
   const signIn = async (formData: FormData) => {
     "use server";
 
-    if (getMigrationState() === "finished") {
+    if (isMigrationFinished()) {
       throw new Error("Migration is finished");
     }
 
@@ -38,7 +41,7 @@ export default function Login({
   const signUp = async (formData: FormData) => {
     "use server";
 
-    if (getMigrationState() === "finished") {
+    if (isMigrationFinished()) {
       throw new Error("Migration is finished");
     }
 
@@ -64,7 +67,7 @@ export default function Login({
     // TRICKLE MIGRATION CODE
     //
 
-    if (getMigrationState() === "trickle") {
+    if (isMigrationTrickle()) {
       const { user } = data;
 
       if (!user) {
