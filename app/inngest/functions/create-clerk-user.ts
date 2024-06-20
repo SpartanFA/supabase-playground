@@ -14,15 +14,16 @@ export const trickleCreateClerkUser = inngest.createFunction(
   async ({ event, step }) => {
     const { email, hashed_password, external_id } = event.data;
 
-    await clerkClient.users.createUser({
+    const newUser = await clerkClient.users.createUser({
       externalId: external_id,
       emailAddress: [email],
-      password: hashed_password,
+      passwordDigest: hashed_password,
+      passwordHasher: "bcrypt",
       skipPasswordChecks: true,
       skipPasswordRequirement: true,
     });
 
-    return "User Created";
+    return JSON.stringify(newUser);
   }
 );
 
@@ -40,14 +41,15 @@ export const batchCreateClerkUser = inngest.createFunction(
   async ({ event, step }) => {
     const { email, hashed_password, external_id } = event.data;
 
-    await clerkClient.users.createUser({
+    const newUser = await clerkClient.users.createUser({
       externalId: external_id,
       emailAddress: [email],
-      password: hashed_password,
+      passwordDigest: hashed_password,
+      passwordHasher: "bcrypt",
       skipPasswordChecks: true,
       skipPasswordRequirement: true,
     });
 
-    return `User created`;
+    return JSON.stringify(newUser);
   }
 );
