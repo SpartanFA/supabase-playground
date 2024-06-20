@@ -6,9 +6,6 @@ export const trickleCreateClerkUser = inngest.createFunction(
     id: "create-clerk-user",
     name: "Create Clerk User",
     concurrency: [{ limit: 1, key: "event.data.external_id" }],
-    priority: {
-      run: "event.data.is_batch ? 0 : 600", // if you are batch you run last.
-    },
     throttle: {
       limit: 2,
       period: "10s",
