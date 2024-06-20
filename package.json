@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.0.11",
-    "@clerk/nextjs": "file:.yalc/@clerk/nextjs",
+    "@clerk/nextjs": "^5.1.6",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "10.4.17",
