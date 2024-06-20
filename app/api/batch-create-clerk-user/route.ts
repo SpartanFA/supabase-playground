@@ -20,8 +20,9 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
     users.map((user) => {
       const { email, hashed_password, external_id } = user;
       return inngest.send({
-        name: "migration/batch/create-clerk-user",
+        name: "migration/create-clerk-user",
         data: {
+          is_batch: true,
           email,
           hashed_password,
           external_id,

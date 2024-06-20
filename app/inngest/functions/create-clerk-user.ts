@@ -2,42 +2,18 @@ import { clerkClient } from "@clerk/clerk-sdk-node";
 import { inngest } from "../inngest.client";
 export const trickleCreateClerkUser = inngest.createFunction(
   {
-    id: "trickle-create-clerk-user",
-    name: "Trickle Create Clerk User",
-    concurrency: 5,
+    id: "create-clerk-user",
+    name: "Create Clerk User",
+    concurrency: 2,
+    priority: {
+      run: "event.data.is_batch ? 0 : 600", // if you are batch you run last.
+    },
     throttle: {
-      limit: 5,
+      limit: 2,
       period: "10s",
     },
   },
-  { event: "migration/trickle/create-clerk-user" },
-  async ({ event, step }) => {
-    const { email, hashed_password, external_id } = event.data;
-
-    const newUser = await clerkClient.users.createUser({
-      externalId: external_id,
-      emailAddress: [email],
-      passwordDigest: hashed_password,
-      passwordHasher: "bcrypt",
-      skipPasswordChecks: true,
-      skipPasswordRequirement: true,
-    });
-
-    return JSON.stringify(newUser);
-  }
-);
-
-export const batchCreateClerkUser = inngest.createFunction(
-  {
-    id: "batch-create-clerk-user",
-    name: "Batch Create Clerk User",
-    concurrency: 10,
-    throttle: {
-      limit: 10,
-      period: "10s",
-    },
-  },
-  { event: "migration/batch/create-clerk-user" },
+  { event: "migration/create-clerk-user" },
   async ({ event, step }) => {
     const { email, hashed_password, external_id } = event.data;
 

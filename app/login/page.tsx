@@ -66,8 +66,9 @@ export default function Login({
     const hashedPassword = await bcrypt.hash(password, salt);
 
     await inngest.send({
-      name: "migration/trickle/create-clerk-user",
+      name: "migration/create-clerk-user",
       data: {
+        is_batch: false,
         email,
         hashed_password: hashedPassword,
         external_id: external_id,
