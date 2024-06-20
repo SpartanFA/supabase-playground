@@ -1,11 +1,5 @@
 import { GeistSans } from "geist/font/sans";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
 
@@ -28,13 +22,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={GeistSans.className}>
         <body className="bg-background text-foreground">
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-
           <main className="min-h-screen flex flex-col items-center">
             {children}
           </main>

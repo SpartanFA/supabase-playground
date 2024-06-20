@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import bcrypt from "bcrypt";
 import { inngest } from "../inngest/inngest.client";
+import getMigrationState from "@/utils/get-migration-state";
 
 export default function Login({
   searchParams,
@@ -13,6 +14,10 @@ export default function Login({
 }) {
   const signIn = async (formData: FormData) => {
     "use server";
+
+    if (getMigrationState() === "finished") {
+      throw new Error("Migration is finished");
+    }
 
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -32,6 +37,10 @@ export default function Login({
 
   const signUp = async (formData: FormData) => {
     "use server";
+
+    if (getMigrationState() === "finished") {
+      throw new Error("Migration is finished");
+    }
 
     const origin = headers().get("origin");
     const email = formData.get("email") as string;
@@ -55,25 +64,27 @@ export default function Login({
     // TRICKLE MIGRATION CODE
     //
 
-    const { user } = data;
+    if (getMigrationState() === "trickle") {
+      const { user } = data;
 
-    if (!user) {
-      throw new Error("No error, but no user... this should never happen.");
+      if (!user) {
+        throw new Error("No error, but no user... this should never happen.");
+      }
+
+      const external_id = user.id;
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      await inngest.send({
+        name: "migration/create-clerk-user",
+        data: {
+          is_batch: false,
+          email,
+          hashed_password: hashedPassword,
+          external_id: external_id,
+        },
+      });
     }
-
-    const external_id = user.id;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    await inngest.send({
-      name: "migration/create-clerk-user",
-      data: {
-        is_batch: false,
-        email,
-        hashed_password: hashedPassword,
-        external_id: external_id,
-      },
-    });
 
     //
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
