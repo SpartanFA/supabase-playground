@@ -31,5 +31,12 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
     })
   );
 
-  return NextResponse.json({ message: `${users.length} users queued` });
+  return NextResponse.json(
+    { message: `${users.length} users queued` },
+    { status: 200 }
+  );
+};
+
+export const GET = async (req: NextRequest, res: NextResponse) => {
+  return NextResponse.json({ message: "test" }, { status: 200 });
 };
