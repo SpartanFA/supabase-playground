@@ -7,7 +7,9 @@ export default clerkMiddleware(async (auth, request, event) => {
 });
 
 export const config = {
-  matcher: [],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/batch-create-clerk-user|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
   // matcher: [
   //   /*
   //    * Match all request paths except:
